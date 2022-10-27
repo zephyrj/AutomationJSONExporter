@@ -41,6 +41,7 @@ namespace {
 }
 
 const std::set<std::wstring> AuExpManager::METADATA_KEYS = { L"meta", L"__index" };
+const std::set<std::wstring> AuExpManager::FUNC_KEYS = { L"FN" };
 
 AuExpManager* AuExpManager::s_Instance = nullptr;
 
@@ -114,12 +115,13 @@ void AuExpManager::EndExport()
 	m_IsExportInProcess = false;
 }
 
-std::vector<std::wstring> AuExpManager::translateLuaKey(const std::wstring& in, bool* isMetaData)
+std::vector<std::wstring> AuExpManager::translateLuaKey(const std::wstring& in, bool* isMetaData, bool* isFunctionData)
 {
 	std::wstringstream test(in);
 	std::wstring segment;
 	std::vector<std::wstring> parts;
-	bool meta = *isMetaData;
+	bool meta = false;
+	bool func = false;
 
 	while (std::getline(test, segment, LUA_KEY_DELIMITER))
 	{
@@ -127,9 +129,14 @@ std::vector<std::wstring> AuExpManager::translateLuaKey(const std::wstring& in, 
 		{
 			meta = true;
 		}
+		else if (!func && ((FUNC_KEYS.find(segment) != FUNC_KEYS.end())))
+		{
+			func = true;
+		}
 		parts.push_back(GetLuaKeyTranslation(segment));
 	}
 	(*isMetaData) = meta;
+	(*isFunctionData) = func;
 	return parts;
 }
 
@@ -144,17 +151,23 @@ void AuExpManager::writeJson(bool outputMetadata)
 {
 	auto dataBuilder = JSONDocumentBuilder::DefaultTranslations();
 	auto metadataBuilder = JSONDocumentBuilder::NoTranslations();
+	auto funcDataBuilder = JSONDocumentBuilder::NoTranslations();
 	for (auto const& it : m_LuaStringData)
 	{
 		bool isMetadata = false;
+		bool isFunc = false;
 		const std::wstring& fullyQualifiedLuaKey = it.first;
 		const std::wstring& luaVal = it.second;
-		auto keyParts = translateLuaKey(fullyQualifiedLuaKey, &isMetadata);
+		auto keyParts = translateLuaKey(fullyQualifiedLuaKey, &isMetadata, &isFunc);
 		if (outputMetadata && isMetadata)
 		{
 			metadataBuilder.add(keyParts, luaVal);
 		}
-		if (!isMetadata)
+		if (isFunc)
+		{
+			funcDataBuilder.add(keyParts, luaVal);
+		}
+		else if (!isMetadata)
 		{
 			dataBuilder.add(keyParts, luaVal);
 		}
@@ -162,6 +175,7 @@ void AuExpManager::writeJson(bool outputMetadata)
 	std::wstring localPath = AuExpManager::Instance()->GetExportDirectory();
 	localPath += L"\\";
 	dataBuilder.writeToFile(localPath + L"data.json");
+	funcDataBuilder.writeToFile(localPath + L"functionData.json");
 	if (outputMetadata)
 	{
 		metadataBuilder.writeToFile(localPath + L"metadata.json");

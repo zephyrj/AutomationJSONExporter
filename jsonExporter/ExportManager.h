@@ -17,6 +17,7 @@ public:
 	static void DestroyInstance() { delete s_Instance; s_Instance = nullptr; }
 
 	static const std::set<std::wstring> METADATA_KEYS;
+	static const std::set<std::wstring> FUNC_KEYS;
 	static constexpr wchar_t LUA_KEY_DELIMITER = L'.';
 
 	AuCarExpErrorCode Init(const AuCarExpCarData* carData);
@@ -34,7 +35,7 @@ public:
 	const wchar_t* GetExportDirectory() const { return m_ExportDirectory.c_str(); }
 
 	const std::wstring& AuExpManager::GetLuaKeyTranslation(const std::wstring& key);
-	std::vector<std::wstring> translateLuaKey(const std::wstring& in, bool* isMetaData);
+	std::vector<std::wstring> translateLuaKey(const std::wstring& in, bool* isMetaData, bool* isFunctionData);
 
 	void AddLuaFiles(const AuCarExpArray<AuCarLuaDataFile>& Data);
 	void AddLuaStringData(const AuCarExpArray<AuCarExpLuaStringData>& Data);

@@ -7,6 +7,11 @@ namespace {
         ~CloseFileOnExitScope() { fclose(m_file); }
         FILE* m_file;
     };
+
+	bool isEmptyTableValue(const std::wstring& val)
+	{
+		return val == L"__empty_table#";
+	}
 }
 
 JSONDocumentBuilder JSONDocumentBuilder::NoTranslations()
@@ -51,9 +56,17 @@ void JSONDocumentBuilder::add(const std::vector<std::wstring>& keyParts, const s
     Value k;
     k.SetString(key_name.c_str(), static_cast<rapidjson::SizeType>(key_name.length()), allocator);
 
-    const auto translatedVal = getValueTranslation(value);
-    Value v;
-    v.SetString(translatedVal.c_str(), static_cast<rapidjson::SizeType>(translatedVal.length()), allocator);
+	Value v;
+	if (isEmptyTableValue(value))
+	{
+		v.SetObject();
+	}
+	else
+	{
+		const auto translatedVal = getValueTranslation(value);
+		v.SetString(translatedVal.c_str(), static_cast<rapidjson::SizeType>(translatedVal.length()), allocator);
+	}
+    
     if (currentParent->IsObject()) {
         currentParent->AddMember(k, v, allocator);
     }
@@ -477,3 +490,5 @@ const std::wstring& JSONDocumentBuilder::getValueTranslation(const std::wstring&
 
     return m_valueTranslations[value];
 }
+
+
