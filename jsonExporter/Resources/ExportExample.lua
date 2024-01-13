@@ -80,11 +80,10 @@ function tablify(table, key_prefix)
 end
 
 function DoExport(CarCalculator, CarFile)
+    CarCalculator.EngineCalculator:CalculateEngine()
 	local CarData = tablify(CarCalculator, "CC")
-	local e = CarCalculator.EngineCalculator:GetEstimatedCamPeak()
-
 	local EngineFuncData = tablify(CExporter.GetEngineCalculatorAPIFuncData(CarCalculator.EngineCalculator), "FN.EC")
-
+	-- local CurveData = CExporter.GetCurveData(CarCalculator.CarInfo.TrimInfo.EngineInfo.ModelInfo.Results.UE4Curves)
 	local CarFiles = CExporter.ExportCarFiles(CarCalculator)
 	CarFiles[string.format("%s - %s.car", CarCalculator.CarInfo.PlatformInfo.Name, CarCalculator.CarInfo.TrimInfo.Name)] = CarFile
 
@@ -114,6 +113,19 @@ end
 function CExporter.ExportCarFiles(CarCalculator)
 	Files = { }
 	return Files
+end
+
+function CExporter.GetCurveData(Curves)
+   local Data = {}
+   for curve_key, curve_data in pairs(Curves) do
+	 local child_table = tablify(curve_data, curve_key)
+	 if next(child_table) == nil then
+	    Data[curve_key] = "__empty_table#"
+	 else
+	    for k2, v2 in pairs(child_table) do Data[k2] = v2 end
+	 end
+   end
+   return Data
 end
 
 -- 
@@ -243,17 +255,17 @@ function CExporter.GetEngineCalculatorAPIFuncData(EngineCalculator)
   --Data.GetMaxRPM = EngineCalculator:GetMaxRPM()  Seems to be a bug in this
   --Data.GetMaxRPMPart = EngineCalculator:GetMaxRPMPart(part)
   Data.GetMaxStroke = EngineCalculator:GetMaxStroke()
-  Data.GetMaxVariantBore = EngineCalculator:GetMaxVariantBore()
-  Data.GetMaxVariantStroke = EngineCalculator:GetMaxVariantStroke()
+  --Data.GetMaxVariantBore = EngineCalculator:GetMaxVariantBore()
+  --Data.GetMaxVariantStroke = EngineCalculator:GetMaxVariantStroke()
   Data.GetMinBore = EngineCalculator:GetMinBore()
   Data.GetMinStroke = EngineCalculator:GetMinStroke()
-  Data.GetMinVariantBore = EngineCalculator:GetMinVariantBore()
-  Data.GetMinVariantStroke = EngineCalculator:GetMinVariantStroke()
+  --Data.GetMinVariantBore = EngineCalculator:GetMinVariantBore()
+  --Data.GetMinVariantStroke = EngineCalculator:GetMinVariantStroke()
   Data.GetMiscEngineCost = EngineCalculator:GetMiscEngineCost()
-  Data.GetModelBore = EngineCalculator:GetModelBore()
-  Data.GetModelBoreSetting = EngineCalculator:GetModelBoreSetting()
-  Data.GetModelStroke = EngineCalculator:GetModelStroke()
-  Data.GetModelStrokeSetting = EngineCalculator:GetModelStrokeSetting()
+  --Data.GetModelBore = EngineCalculator:GetModelBore()
+  --Data.GetModelBoreSetting = EngineCalculator:GetModelBoreSetting()
+  ----Data.GetModelStroke = EngineCalculator:GetModelStroke()
+  --Data.GetModelStrokeSetting = EngineCalculator:GetModelStrokeSetting()
   --Data.GetMostUsedTechPoolForSection = EngineCalculator:GetMostUsedTechPoolForSection(sectionName)
   Data.GetNaturallyAspiratedEnginePowerPeak = EngineCalculator:GetNaturallyAspiratedEnginePowerPeak()
   Data.GetPanelFractionalContributionToET = EngineCalculator:GetPanelFractionalContributionToET()
@@ -310,6 +322,15 @@ function CExporter.GetEngineCalculatorAPIFuncData(EngineCalculator)
   Data.IsFamilyComplete = EngineCalculator:IsFamilyComplete()
   Data.IsIgnitionTimineDisabled = EngineCalculator:IsIgnitionTimineDisabled()
   Data.RPMEngineeringPenalty = EngineCalculator:RPMEngineeringPenalty()
+  Data.CalculateFuelFlowLimit = EngineCalculator:CalculateFuelFlowLimit(1000)
+  Data.CalculateFuelFlowLimitInKGS = EngineCalculator:CalculateFuelFlowLimitInKGS(1000)
+  Data.GetAFRValue = EngineCalculator:GetAFRValue(10)
+
+  -- Can't get this to return anything
+  -- GetEngineGraphResultsValueByRPMAndThrottle(CurveName, CurvesIter, lerpValue, InThrottle)
+  -- local lerpVal = 1
+  -- local result = { EngineCalculator:GetEngineGraphResultsValueByRPMAndThrottle("Econ", 10, lerpVal, 0.9) }
+
   --Data.StaticCalculateEngineSize = EngineCalculator.StaticCalculateEngineSize()
   --Data.StaticCalculateEngineSizeSeperate = EngineCalculator.StaticCalculateEngineSizeSeperate()
   --Data.StaticGetEngineScale = EngineCalculator.StaticGetEngineScale()

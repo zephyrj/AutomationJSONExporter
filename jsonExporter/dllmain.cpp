@@ -299,8 +299,14 @@ AuCarExpErrorCode AuCarExportDLL::AddLuaStringData(const AuCarExpArray<AuCarExpL
 	return AuCarExpErrorCode_Success;
 }
 
+AuCarExpErrorCode AuCarExportDLL::GetLuaFileCount(unsigned int* fileCount)
+{
+	*fileCount = 1;
 
-AuCarExpErrorCode AuCarExportDLL::GetLUAFileLength(unsigned int* retLength)
+	return AuCarExpErrorCode_Success;
+}
+
+AuCarExpErrorCode AuCarExportDLL::GetLuaFileLength(unsigned int* retLength, unsigned int FileNum)
 {
 	*retLength = 0;
 
@@ -322,7 +328,7 @@ AuCarExpErrorCode AuCarExportDLL::GetLUAFileLength(unsigned int* retLength)
 	return AuCarExpErrorCode_Success;
 }
 
-AuCarExpErrorCode AuCarExportDLL::GetLUAFile(AuCarExpArray<wchar_t>& stringBuffer)
+AuCarExpErrorCode AuCarExportDLL::GetLuaFile(AuCarExpArray<wchar_t>& stringBuffer, unsigned int FileNum)
 {
 	if (!stringBuffer.GetData())
 	{
