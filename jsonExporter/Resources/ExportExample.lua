@@ -322,9 +322,9 @@ function CExporter.GetEngineCalculatorAPIFuncData(EngineCalculator)
   Data.IsFamilyComplete = EngineCalculator:IsFamilyComplete()
   Data.IsIgnitionTimineDisabled = EngineCalculator:IsIgnitionTimineDisabled()
   Data.RPMEngineeringPenalty = EngineCalculator:RPMEngineeringPenalty()
-  Data.CalculateFuelFlowLimit = EngineCalculator:CalculateFuelFlowLimit(1000)
-  Data.CalculateFuelFlowLimitInKGS = EngineCalculator:CalculateFuelFlowLimitInKGS(1000)
-  Data.GetAFRValue = EngineCalculator:GetAFRValue(10)
+  --Data.CalculateFuelFlowLimit = EngineCalculator:CalculateFuelFlowLimit(1000)
+  --Data.CalculateFuelFlowLimitInKGS = EngineCalculator:CalculateFuelFlowLimitInKGS(1000)
+  --Data.GetAFRValue = EngineCalculator:GetAFRValue(10)
 
   -- Can't get this to return anything
   -- GetEngineGraphResultsValueByRPMAndThrottle(CurveName, CurvesIter, lerpValue, InThrottle)
